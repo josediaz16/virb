@@ -11,6 +11,12 @@ let g:loaded_virb = 1
 
 let s:fifo = ".virb/fifo"
 
+if empty($VIM_SESSION_FILE)
+  let g:vim_session_file = ".virb/session"
+else
+  let g:vim_session_file = $VIM_SESSION_FILE
+endif
+
 " split into two windows: a session buffer and a interactive buffer
 
 function! s:focus_virb_output_window()
@@ -20,7 +26,7 @@ function! s:focus_virb_output_window()
   let winnr = bufwinnr(s:virb_output_bufnr)
   if winnr == -1
     " create window
-    split! .virb/session
+    exec 'split!' . g:vim_session_file
     exec "buffer" . s:virb_output_bufnr
   else
     exec winnr . "wincmd w"
@@ -34,7 +40,7 @@ endfunc
 
 " main execution function
 func! Virb() range
-  let s:mtime = getftime(".virb/session")
+  let s:mtime = getftime(g:vim_session_file)
   let cmd = ":".a:firstline.",".a:lastline."w >> .virb/fifo"
   exec cmd
   if $VIRB == 'pry'
@@ -84,7 +90,7 @@ function! VirbInteractive()
   nnoremap <buffer> <c-l> :call <SID>clearInteractiveBuffer()<CR>
 endfunc
 
-split! .virb/session
+exec 'split!' . g:vim_session_file
 setlocal autoread
 let s:virb_output_bufnr = bufnr('%')
 setlocal nu

@@ -24,7 +24,7 @@ require "irb/locale"
 
 STDOUT.sync = true
 
-$outfile = '.virb/session'
+$outfile = ENV["VIM_SESSION_FILE"] || ".virb/session"
 STDERR.reopen "/dev/null" # this prevent logging to cursor location in rails c
 $infifo = '.virb/fifo'
 
@@ -94,7 +94,7 @@ module IRB
     unless File.exist?('.virb/fifo')
       `mkfifo .virb/fifo`
     end
-    `touch .virb/session`
+    `touch .#{$outfile}`
 
     vimscript = File.join(File.dirname(__FILE__), '..', 'virb.vim')
 
